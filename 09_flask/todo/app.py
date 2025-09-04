@@ -34,7 +34,7 @@ def delete(todo_id):
     try:
         del todos[todo_id]
         save_todos(todos)
-    except (IndexError, TypeError) as e:
+    except (IndexError, TypeError, NameError) as e:
         app.logger.warning( f"Error with {todo_id} : {e}" )
 
     return redirect(url_for("index"))
