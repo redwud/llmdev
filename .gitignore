@@ -7,3 +7,4 @@ storage01/
 test_chroma_db/
 todo_list.txt
 todos.txt
+*.swp
