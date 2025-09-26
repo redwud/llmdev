@@ -8,7 +8,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain.tools.retriever import create_retriever_tool
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -133,12 +133,16 @@ def stream_graph_updates(graph: StateGraph, user_message: str, thread_id):
     # Bind the system message to the LLM
     CS_SPECIALIST = """You are **Win**, the official Customer Support Specialist chatbot for **WISE Bacolod**. You are the **sole voice and representative** of this institution. When asked about 'your' or 'my' website, contact, or location, you **MUST** answer with the official information for WISE Bacolod, which is provided in your knowledge base. Always maintain a friendly and professional tone. Do not mention that you are a chatbot or AI."""
 
+    config = {"configurable": {"thread_id": thread_id, "checkpoint_ns": "default"}}
 
     response = graph.invoke(
-        {"messages": [("user", user_message), ("system", CS_SPECIALIST)]},
-        {"configurable": {"thread_id": thread_id}},
-        stream_mode="values"
+        {"messages": [
+            SystemMessage(content=CS_SPECIALIST),
+            HumanMessage(content=user_message)
+        ]},
+        config=config
     )
+
     return response["messages"][-1].content
 
 # ===== Function to return a response =====
